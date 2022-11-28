@@ -1,0 +1,2047 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.1.0",
+        "title": "Manager app backend",
+        "description": "Manager Application API",
+        "license": "ISC"
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "API for signIn/signUp"
+        },
+        {
+            "name": "Users",
+            "description": "API for users"
+        },
+        {
+            "name": "Boards",
+            "description": "API for boards"
+        },
+        {
+            "name": "Columns",
+            "description": "API for columns"
+        },
+        {
+            "name": "Tasks",
+            "description": "API for tasks"
+        },
+        {
+            "name": "Files",
+            "description": "API for files"
+        },
+        {
+            "name": "Points",
+            "description": "API for points(checkList in task)"
+        }
+    ],
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "description": "Enter your token in format *Bearer token*",
+            "in": "header"
+        }
+    },
+    "consumes": ["application/json"],
+    "produces": ["application/json"],
+    "paths": {
+        "/auth/signin": {
+            "post": {
+                "tags": ["Auth"],
+                "summary": "SignIn",
+                "description": "Get token",
+                "parameters": [
+                    {
+                        "name": "AuthInfo",
+                        "in": "body",
+                        "description": "User auth info",
+                        "schema": {
+                            "required": [
+                                "login",
+                                "password"
+                            ],
+                            "properties": {
+                                "login": {
+                                    "type": "string"
+                                },
+                                "password": {
+                                    "type": "string"
+                                }
+                            },
+                            "example": {
+                                "login": "IMask",
+                                "password": "Tesla4ever"
+                            }
+                        }
+                    }
+                ],
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "Successeful login",
+                        "schema": {
+                            "properties": {
+                                "token": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Authorization error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/signup": {
+            "post": {
+                "tags": ["Auth"],
+                "summary": "SignUp",
+                "description": "Create new User",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "body",
+                        "description": "User that we want to create",
+                        "schema": {
+                            "required": [
+                                "name",
+                                "login",
+                                "password"
+                            ],
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "login": {
+                                    "type": "string"
+                                },
+                                "password": {
+                                    "type": "string"
+                                }
+                            },
+                            "example": {
+                                "name": "Ilon Mask",
+                                "login": "IMask",
+                                "password": "Tesla4ever"
+                            }
+                        }
+                    }
+                ],
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "New user is created",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Login already exist",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Users"],
+                "summary": "Get all Users",
+                "description": "Get all Users on server",
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "All users on server",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/User"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{userId}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Users"],
+                "summary": "Get User by Id",
+                "description": "Find User",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Founded user",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "404": {
+                        "description": "User was not founded!",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Users"],
+                "summary": "Update User by Id",
+                "description": "Update User",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "new params",
+                        "in": "body",
+                        "description": "New params",
+                        "schema": {
+                            "required": [
+                                "name",
+                                "login",
+                                "password"
+                            ],
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "login": {
+                                    "type": "string"
+                                },
+                                "password": {
+                                    "type": "string"
+                                }
+                            },
+                            "example": {
+                                "name": "Ilon Mask",
+                                "login": "IMask",
+                                "password": "Tesla4ever"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated user",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Login already exist",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Users"],
+                "summary": "Delete User by Id",
+                "description": "Delete User",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted user",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                }
+            }
+        },
+        "/boards": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Boards"],
+                "summary": "Get all Boards",
+                "description": "Get all Boards on server",
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "All boards on server",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Board"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Boards"],
+                "summary": "Create Board",
+                "description": "Create Board",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "new Board params",
+                        "in": "body",
+                        "description": "New params",
+                        "schema": {
+                            "required": [
+                                "title",
+                                "owner",
+                                "users"
+                            ],
+                            "properties": {
+                                "title": {
+                                    "type": "string"
+                                },
+                                "owner": {
+                                    "type": "string"
+                                },
+                                "users": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Created board",
+                        "schema": {
+                            "$ref": "#/definitions/Board"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/boards/{boardId}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Boards"],
+                "summary": "Get Board by Id",
+                "description": "Find Board",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "boardId",
+                        "in": "path",
+                        "description": "Board ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Founded board",
+                        "schema": {
+                            "$ref": "#/definitions/Board"
+                        }
+                    },
+                    "404": {
+                        "description": "Board was not founded!",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Boards"],
+                "summary": "Update Board by Id",
+                "description": "Update Board",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "boardId",
+                        "in": "path",
+                        "description": "Board ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "new params",
+                        "in": "body",
+                        "description": "New params",
+                        "schema": {
+                            "required": [
+                                "title",
+                                "owner",
+                                "users"
+                            ],
+                            "properties": {
+                                "title": {
+                                    "type": "string"
+                                },
+                                "owner": {
+                                    "type": "string"
+                                },
+                                "users": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated board",
+                        "schema": {
+                            "$ref": "#/definitions/Board"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Boards"],
+                "summary": "Delete Board by Id",
+                "description": "Delete Board",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "boardId",
+                        "in": "path",
+                        "description": "Board ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted board",
+                        "schema": {
+                            "$ref": "#/definitions/Board"
+                        }
+                    }
+                }
+            }
+        },
+        "/boardsSet": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Boards"],
+                "summary": "Get Boards by ids list",
+                "description": "Get Boards by list of boardId",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "ids",
+                        "in": "query",
+                        "description": "list of boardId",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Boards by ids list",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Board"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/boardsSet/{userId}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Boards"],
+                "summary": "Get Boards by userId",
+                "description": "Get Boards where user is owner or one of invited",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Boards by userId",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Board"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/boards/{boardId}/columns": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Columns"],
+                "summary": "Get Columns in Board",
+                "description": "Get Columns in board",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "boardId",
+                        "in": "path",
+                        "description": "Board ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "All columns in board",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Column"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Columns"],
+                "summary": "Create Column",
+                "description": "Create Column in board",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "boardId",
+                        "in": "path",
+                        "description": "Board ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "new Column params",
+                        "in": "body",
+                        "description": "New params",
+                        "schema": {
+                            "required": [
+                                "title",
+                                "order"
+                            ],
+                            "properties": {
+                                "title": {
+                                    "type": "string"
+                                },
+                                "order": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Created column",
+                        "schema": {
+                            "$ref": "#/definitions/Column"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/boards/{boardId}/columns/{columnId}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Columns"],
+                "summary": "Get Column by Id",
+                "description": "Find Column",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "boardId",
+                        "in": "path",
+                        "description": "Board ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "columnId",
+                        "in": "path",
+                        "description": "Column ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Founded column",
+                        "schema": {
+                            "$ref": "#/definitions/Column"
+                        }
+                    },
+                    "404": {
+                        "description": "Column was not founded!",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Columns"],
+                "summary": "Update Column by Id",
+                "description": "Update Column",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "boardId",
+                        "in": "path",
+                        "description": "Board ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "columnId",
+                        "in": "path",
+                        "description": "Column ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "new Column params",
+                        "in": "body",
+                        "description": "New params",
+                        "schema": {
+                            "required": [
+                                "title",
+                                "order"
+                            ],
+                            "properties": {
+                                "title": {
+                                    "type": "string"
+                                },
+                                "order": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated column",
+                        "schema": {
+                            "$ref": "#/definitions/Column"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Columns"],
+                "summary": "Delete Column by Id",
+                "description": "Delete Column",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "boardId",
+                        "in": "path",
+                        "description": "Board ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "columnId",
+                        "in": "path",
+                        "description": "Column ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted column",
+                        "schema": {
+                            "$ref": "#/definitions/Column"
+                        }
+                    }
+                }
+            }
+        },
+        "/columnsSet": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Columns"],
+                "summary": "Get Columns by ids list or UserId",
+                "description": "Get Columns by list of columnId or in Boards where user is owner or one of invited",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "ids",
+                        "in": "query",
+                        "description": "list of columnId",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "userId",
+                        "in": "query",
+                        "description": "User ID",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Columns list",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Column"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Columns"],
+                "summary": "Update set of Columns",
+                "description": "Change oreder of list of columns",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "columns",
+                        "in": "body",
+                        "description": "list of new params",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "required": [
+                                "_id",
+                                "order"
+                            ],
+                            "properties": {
+                                "_id": {
+                                    "type": "string"
+                                },
+                                "order": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated columns",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Column"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Columns"],
+                "summary": "Create set of Columns",
+                "description": "Create set of Columns",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "columns",
+                        "in": "body",
+                        "description": "list of new columns",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "required": [
+                                "title",
+                                "order",
+                                "boardId"
+                            ],
+                            "properties": {
+                                "title": {
+                                    "type": "string"
+                                },
+                                "order": {
+                                    "type": "number"
+                                },
+                                "boardId": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Created columns",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Column"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/boards/{boardId}/columns/{columnId}/tasks": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Tasks"],
+                "summary": "Get Tasks in Column",
+                "description": "Get Tasks in columns",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "boardId",
+                        "in": "path",
+                        "description": "Board ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "columnId",
+                        "in": "path",
+                        "description": "Column ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "All tasks in column",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Task"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Tasks"],
+                "summary": "Create Task",
+                "description": "Create Task in column",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "boardId",
+                        "in": "path",
+                        "description": "Board ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "columnId",
+                        "in": "path",
+                        "description": "Column ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "new Task params",
+                        "in": "body",
+                        "description": "New params",
+                        "schema": {
+                            "required": [
+                                "title",
+                                "order",
+                                "description",
+                                "userId",
+                                "users"
+                            ],
+                            "properties": {
+                                "title": {
+                                    "type": "string"
+                                },
+                                "order": {
+                                    "type": "number"
+                                },
+                                "description": {
+                                    "type": "string"
+                                },
+                                "userId": {
+                                    "type": "number"
+                                },
+                                "users": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Created task",
+                        "schema": {
+                            "$ref": "#/definitions/Task"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/boards/{boardId}/columns/{columnId}/tasks/{taskId}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Tasks"],
+                "summary": "Get Task by Id",
+                "description": "Find Task",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "boardId",
+                        "in": "path",
+                        "description": "Board ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "columnId",
+                        "in": "path",
+                        "description": "Column ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "taskId",
+                        "in": "path",
+                        "description": "Task ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Founded task",
+                        "schema": {
+                            "$ref": "#/definitions/Task"
+                        }
+                    },
+                    "404": {
+                        "description": "Task was not founded!",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Tasks"],
+                "summary": "Update Task by Id",
+                "description": "Update Task",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "boardId",
+                        "in": "path",
+                        "description": "Board ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "columnId",
+                        "in": "path",
+                        "description": "Column ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "taskId",
+                        "in": "path",
+                        "description": "Task ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "new Task params",
+                        "in": "body",
+                        "description": "New params",
+                        "schema": {
+                            "required": [
+                                "title",
+                                "order",
+                                "description",
+                                "columnId",
+                                "userId",
+                                "users"
+                            ],
+                            "properties": {
+                                "title": {
+                                    "type": "string"
+                                },
+                                "order": {
+                                    "type": "number"
+                                },
+                                "description": {
+                                    "type": "string"
+                                },
+                                "columnId": {
+                                    "type": "string"
+                                },
+                                "userId": {
+                                    "type": "number"
+                                },
+                                "users": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated task",
+                        "schema": {
+                            "$ref": "#/definitions/Task"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Tasks"],
+                "summary": "Delete Task by Id",
+                "description": "Delete Task",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "boardId",
+                        "in": "path",
+                        "description": "Board ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "columnId",
+                        "in": "path",
+                        "description": "Column ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "taskId",
+                        "in": "path",
+                        "description": "Task ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted task",
+                        "schema": {
+                            "$ref": "#/definitions/Task"
+                        }
+                    }
+                }
+            }
+        },
+        "/tasksSet": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Tasks"],
+                "summary": "Get Tasks by ids list, UserId or search request",
+                "description": "Get Tasks by list of taskId or in Boards where user is owner or one of invited, or by search request",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "ids",
+                        "in": "query",
+                        "description": "list of columnId",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "userId",
+                        "in": "query",
+                        "description": "User ID",
+                        "type": "string"
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "search request. In title, description and names of owner and responsible users",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tasks list",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Task"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Tasks"],
+                "summary": "Update set of Tasks",
+                "description": "Change oreder and column of list of tasks",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "tasks",
+                        "in": "body",
+                        "description": "list of new params",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "required": [
+                                "_id",
+                                "order",
+                                "columnId"
+                            ],
+                            "properties": {
+                                "_id": {
+                                    "type": "string"
+                                },
+                                "order": {
+                                    "type": "number"
+                                },
+                                "columnId": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated tasks",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Task"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tasksSet/{boardId}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Tasks"],
+                "summary": "Get Tasks by Board Id",
+                "description": "Get Tasks in selected Board",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "boardId",
+                        "in": "path",
+                        "description": "Board ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tasks list",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Task"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/file": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Files"],
+                "summary": "Get Files by ids list, UserId or TaskId",
+                "description": "Get Files by list of taskId or in Boards where user is owner or one of invited, or by TaskId",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "ids",
+                        "in": "query",
+                        "description": "list of columnId",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "userId",
+                        "in": "query",
+                        "description": "User ID",
+                        "type": "string"
+                    },
+                    {
+                        "name": "taskId",
+                        "in": "query",
+                        "description": "TaskId",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Files list",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/File"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Files"],
+                "summary": "Upload file",
+                "description": "upload file to deployUrl/files/",
+                "consumes": ["multipart/form-data"],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "boardId",
+                        "in": "formData",
+                        "description": "Board Id",
+                        "type": "string"
+                    },
+                    {
+                        "name": "taskId",
+                        "in": "formData",
+                        "description": "Task Id",
+                        "type": "string"
+                    },
+                    {
+                        "name": "file",
+                        "in": "formData",
+                        "description": "File to upload",
+                        "type": "file"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Uploaded File",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/File"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "402": {
+                        "description": "File already exist",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/file/{boardId}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Files"],
+                "summary": "Get Files by BoardId",
+                "description": "Get files by BoardId",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "boardId",
+                        "in": "path",
+                        "description": "Board ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Founded files",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/File"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/file/{fileId}": {
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Files"],
+                "summary": "Delete File by Id",
+                "description": "Delete File by Id",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "fileId",
+                        "in": "path",
+                        "description": "File ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted file",
+                        "schema": {
+                            "$ref": "#/definitions/File"
+                        }
+                    }
+                }
+            }
+        },
+        "/points": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Points"],
+                "summary": "Get Points by ids list or UserId",
+                "description": "Get Points by list of pointId or in Boards where user is owner or one of invited",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "ids",
+                        "in": "query",
+                        "description": "list of pointId",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "userId",
+                        "in": "query",
+                        "description": "User ID",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Points list",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Point"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Points"],
+                "summary": "Create Point",
+                "description": "Create a new point",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "new Point params",
+                        "in": "body",
+                        "description": "New params",
+                        "schema": {
+                            "required": [
+                                "title",
+                                "taskId",
+                                "boardId",
+                                "done"
+                            ],
+                            "properties": {
+                                "title": {
+                                    "type": "string"
+                                },
+                                "taskId": {
+                                    "type": "string"
+                                },
+                                "boardId": {
+                                    "type": "string"
+                                },
+                                "done": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Created Point",
+                        "schema": {
+                            "$ref": "#/definitions/Point"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "402": {
+                        "description": "File already exist",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Points"],
+                "summary": "Update set of Points",
+                "description": "Change done filed in set of points",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "points",
+                        "in": "body",
+                        "description": "list of new params",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "required": [
+                                "_id",
+                                "done"
+                            ],
+                            "properties": {
+                                "_id": {
+                                    "type": "string"
+                                },
+                                "done": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated Points",
+                        "schema": {
+                            "$ref": "#/definitions/Point"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "402": {
+                        "description": "File already exist",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/points/{taskId}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Points"],
+                "summary": "Get Points by TaskId",
+                "description": "Get Points by TaskId",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "taskId",
+                        "in": "path",
+                        "description": "Task ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Founded Points",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Point"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/points/{pointId}": {
+            "patch": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Points"],
+                "summary": "Update Point",
+                "description": "Change title and done",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "pointId",
+                        "in": "path",
+                        "description": "Point ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "new params",
+                        "in": "body",
+                        "description": "New params",
+                        "schema": {
+                            "required": [
+                                "title",
+                                "done"
+                            ],
+                            "properties": {
+                                "title": {
+                                    "type": "string"
+                                },
+                                "done": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated column",
+                        "schema": {
+                            "$ref": "#/definitions/Column"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": ["Points"],
+                "summary": "Delete Point by Id",
+                "description": "Delete Point by Id",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "pointId",
+                        "in": "path",
+                        "description": "Point ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted Point",
+                        "schema": {
+                            "$ref": "#/definitions/File"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "User": {
+            "required": [
+                "_id",
+                "name",
+                "login"
+            ],
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "login": {
+                    "type": "string"
+                }
+            }
+        },
+        "Board": {
+            "required": [
+                "_id",
+                "title",
+                "owner",
+                "users"
+            ],
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "owner": {
+                    "type": "string"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "example": {
+                "_id": "Board id",
+                "title": "Board title",
+                "owner": "userId of owner",
+                "users": [
+                    "userId of invited user #1",
+                    "userId of invited user #2"
+                ]
+            }
+        },
+        "Column": {
+            "required": [
+                "_id",
+                "title",
+                "order",
+                "boardId"
+            ],
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "number"
+                },
+                "boardId": {
+                    "type": "string"
+                }
+            },
+            "example": {
+                "_id": "Column id",
+                "title": "Column title",
+                "order": 1,
+                "boardId": "Id of boards"
+            }
+        },
+        "Task": {
+            "required": [
+                "_id",
+                "title",
+                "order",
+                "boardId",
+                "columnId",
+                "description",
+                "userId",
+                "users"
+            ],
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "number"
+                },
+                "boardId": {
+                    "type": "string"
+                },
+                "columnId": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "number"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "example": {
+                "_id": "Task id",
+                "title": "Task title",
+                "order": 0,
+                "boardId": "id of board",
+                "columnId": "id of column",
+                "description": "Task decription",
+                "userId": "userId of task owner",
+                "users": [
+                    "userId of responsible user #1",
+                    "userId of responsible user #2"
+                ]
+            }
+        },
+        "File": {
+            "required": [
+                "_id",
+                "name",
+                "taskId",
+                "boardId",
+                "path"
+            ],
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "taskId": {
+                    "type": "string"
+                },
+                "boardId": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                }
+            },
+            "example": {
+                "_id": "File id",
+                "name": "example.img",
+                "taskId": "id of task",
+                "boardId": "id of board",
+                "path": "files/taskId-name"
+            }
+        },
+        "Point": {
+            "required": [
+                "_id",
+                "title",
+                "taskId",
+                "boardId",
+                "done"
+            ],
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "taskId": {
+                    "type": "number"
+                },
+                "boardId": {
+                    "type": "string"
+                },
+                "done": {
+                    "type": "boolean"
+                }
+            },
+            "example": {
+                "_id": "Point id",
+                "title": "Point title",
+                "taskId": "Id of task",
+                "boardId": "Id of board",
+                "done": false
+            }
+        },
+        "ErrorResponse": {
+            "required": [
+                "statusCode",
+                "message"
+            ],
+            "properties": {
+                "statusCode": {
+                    "type": "number"
+                },
+                "message": {
+                    "type": "string"
+                }
+            },
+            "example": {
+                "statusCode": "4xx",
+                "message": "reason"
+            }
+        }
+    }
+}
